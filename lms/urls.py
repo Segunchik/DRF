@@ -17,7 +17,7 @@ from lms.views import (
 app_name = LmsConfig.name
 
 router = SimpleRouter()
-router.register("", CourseViewSet, basename="course")
+router.register("courses", CourseViewSet, basename="courses")
 
 
 urlpatterns = [
