@@ -23,28 +23,29 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-            "phone",
-            "city",
-            "avatar",
-            "date_joined",
-            "payments_count",
-            "total_spent",
-            "payments",
-        )
+        fields = "__all__"
+        # fields = (
+        #     "id",
+        #     "email",
+        #     "first_name",
+        #     "last_name",
+        #     "phone",
+        #     "city",
+        #     "avatar",
+        #     "date_joined",
+        #     "payments_count",
+        #     "total_spent",
+        #     "payments",
+        # )
         read_only_fields = ("id", "date_joined")
 
     def get_payments_count(self, obj):
         """Получить количество платежей пользователя."""
-        return obj.payments.count()
+        return obj.payment.count()
 
     def get_total_spent(self, obj):
         """Получить общую сумму потраченных денег."""
-        total = sum(payment.amount for payment in obj.payments.all())
+        total = sum(payment.amount for payment in obj.payment.all())
         return float(total)
 
 

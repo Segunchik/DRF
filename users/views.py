@@ -54,7 +54,7 @@ class UserViewSet(ModelViewSet):
         """
         user = self.request.user
 
-        if self.action == "list" and user.has_perm("users.view_all_users"):
+        if self.action == "list" and user.has_perm("users.view_user"):
             # Модераторы видят всех пользователей
             return self.queryset
         elif user.is_authenticated:

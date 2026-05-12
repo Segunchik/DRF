@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+from config import settings
 
 
 class Course(models.Model):
@@ -10,6 +11,12 @@ class Course(models.Model):
         upload_to="course/preview/", verbose_name="Превью", blank=True, null=True
     )
     description = models.TextField(verbose_name="Описание курса", blank=True, null=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="автор",
+    )
 
     class Meta:
         verbose_name = "Курс"
@@ -33,6 +40,12 @@ class Lesson(models.Model):
     video_url = models.URLField(blank=True, null=True, verbose_name="Ссылка на видео")
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name="lesson", verbose_name="Курс"
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="автор",
     )
 
     class Meta:
