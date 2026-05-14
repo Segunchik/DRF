@@ -11,9 +11,6 @@ from lms.views import (
     LessonUpdateApiView,
 )
 
-# from rest_framework.urls import app_name
-
-
 app_name = LmsConfig.name
 
 router = SimpleRouter()
