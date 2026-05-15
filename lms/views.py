@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from lms.models import Course, Lesson
 from lms.serialisers import CourseSerializer, LessonSerializer
-from users.permissions import IsModerator, IsOwnProfile
+from users.permissions import IsModerator, IsOwnProfile, IsOwnerOrModerator, IsNotModeratorOrOwner
 
 
 class CourseViewSet(ModelViewSet):
@@ -45,21 +45,21 @@ class LessonCreateApiView(CreateAPIView):
 class LessonListApiView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = (IsOwnProfile | IsModerator, IsAuthenticated)
+    permission_classes = [IsOwnProfile | IsModerator, IsAuthenticated]
 
 class LessonRetrieveApiView(RetrieveAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = (IsOwnProfile | IsModerator, IsAuthenticated)
+    permission_classes = [IsOwnerOrModerator, IsAuthenticated,]
 
 
 class LessonUpdateApiView(UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = (IsOwnProfile | IsModerator, IsAuthenticated)
+    permission_classes = (IsOwnerOrModerator, IsAuthenticated)
 
 
 class LessonDestroyApiView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = (~IsModerator, IsOwnProfile, IsAuthenticated)
+    permission_classes = (IsNotModeratorOrOwner, IsAuthenticated)
