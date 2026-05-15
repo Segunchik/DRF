@@ -1,7 +1,6 @@
 from rest_framework import permissions
 
 
-
 class IsOwnerOrModerator(permissions.BasePermission):
     """
     Разрешает доступ владельцу объекта ИЛИ модератору (staff).
@@ -9,10 +8,10 @@ class IsOwnerOrModerator(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # Владелец объекта (поле owner)
-        if hasattr(obj, 'owner') and obj.owner == request.user:
+        if hasattr(obj, "owner") and obj.owner == request.user:
             return True
         # Модератор
-        if request.user.groups.filter(name='moderators').exists():
+        if request.user.groups.filter(name="moderators").exists():
             return True
         return False
 
@@ -26,11 +25,11 @@ class IsNotModeratorOrOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # Владелец объекта имеет доступ
-        if hasattr(obj, 'owner') and obj.owner == request.user:
+        if hasattr(obj, "owner") and obj.owner == request.user:
             return True
 
         # Пользователи, не являющиеся модераторами, имеют доступ
-        if not request.user.groups.filter(name='moderators').exists():
+        if not request.user.groups.filter(name="moderators").exists():
             return True
 
         return False

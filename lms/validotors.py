@@ -1,5 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
+
 # from django.utils.translation import gettext_lazy as _
 
 
@@ -13,7 +14,7 @@ class VideoUrlValidator:
     """
 
     YOUTUBE_PATTERNS = [
-        r'^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/)|youtu\.be/)[\w=-]{11}(?:\?[\w=&-]*)?$',
+        r"^(?:https?://)?(?:www\.)?(?:youtube\.com/(?:watch\?v=|embed/|v/|shorts/)|youtu\.be/)[\w=-]{11}(?:\?[\w=&-]*)?$",
     ]
 
     def __call__(self, value):
@@ -27,4 +28,6 @@ class VideoUrlValidator:
 
         # Проверяем, соответствует ли URL хотя бы одному YouTube‑паттерну
         if not any(re.match(pattern, value) for pattern in self.YOUTUBE_PATTERNS):
-            raise ValidationError('Разрешены только ссылки на YouTube (youtube.com или youtu.be)')
+            raise ValidationError(
+                "Разрешены только ссылки на YouTube (youtube.com или youtu.be)"
+            )

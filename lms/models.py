@@ -54,3 +54,27 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name="пользователь",
+        related_name="subscriptions",
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        verbose_name="курс",
+        related_name="subscribers",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="дата подписки")
+
+    class Meta:
+        verbose_name = "подписка"
+        verbose_name_plural = "подписки"
+        unique_together = ("user", "course")
+
+    def __str__(self):
+        return f"{self.user.email} -> {self.course.title}"
