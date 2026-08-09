@@ -84,22 +84,18 @@ class Payment(models.Model):
         null=True,
     )
     payment_link = models.URLField(
-        max_length=500,
-        blank=True,
-        null=True,
-        verbose_name='Ссылка на оплату'
+        max_length=500, blank=True, null=True, verbose_name="Ссылка на оплату"
     )
     payment_status = models.CharField(
         max_length=20,
-        default='pending',
+        default="pending",
         choices=[
-            ('pending','Ожидает оплаты'),
-            ('paid','Оплачено'),
-            ('failed','Ошибка платежа')
+            ("pending", "Ожидает оплаты"),
+            ("paid", "Оплачено"),
+            ("failed", "Ошибка платежа"),
         ],
-        verbose_name='Статус платежа'
+        verbose_name="Статус платежа",
     )
-
 
     class Meta:
         verbose_name = "Платеж"
