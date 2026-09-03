@@ -30,9 +30,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
-    'drf_spectacular',
-    'drf_yasg',
-    'corsheaders',
+    "drf_spectacular",
+    "drf_yasg",
+    "corsheaders",
     "users",
     "lms",
 ]
@@ -45,8 +45,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
-
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -134,14 +133,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API Documentation', # Заголовок для документации
-    'DESCRIPTION': 'Описание вашего API', # Описание (опционально)
-    'VERSION': '1.0.0', # Версия вашего API
-    'SERVE_INCLUDE_SCHEMA': False, # Не показывать сырую схему OpenAPI на главной странице (опционально)
+    "TITLE": "API Documentation",  # Заголовок для документации
+    "DESCRIPTION": "Описание вашего API",  # Описание (опционально)
+    "VERSION": "1.0.0",  # Версия вашего API
+    "SERVE_INCLUDE_SCHEMA": False,  # Не показывать сырую схему OpenAPI на главной странице (опционально)
 }
 
 
@@ -152,12 +151,14 @@ SIMPLE_JWT = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',  # Замените на адрес вашего фронтенд-сервера
+    "http://localhost:8000",  # Замените на адрес вашего фронтенд-сервера
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000', #  Замените на адрес вашего фронтенд-сервера
+    "http://localhost:8000",  #  Замените на адрес вашего фронтенд-сервера
     # и добавьте адрес бэкенд-сервера
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
+
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")

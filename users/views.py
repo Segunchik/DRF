@@ -1,9 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -11,6 +12,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from users.models import User, Payment
 from users.permissions import IsOwnProfile, IsModerator
 from users.serialisers import UserSerializer, PaymentSerializer, UserProfileSerializer
+from users.services import (
+    create_stripe_product,
+    create_stripe_price,
+    create_stripe_session,
+)
 
 
 class UserViewSet(ModelViewSet):
@@ -110,14 +116,77 @@ class UserViewSet(ModelViewSet):
             raise ValidationError(f"Ошибка при обновлении пользователя: {str(e)}")
 
 
-class PaymentListAPIView(generics.ListAPIView):
+class PaymentViewSet(ModelViewSet):
     """
-    ViewSet для модели Payment с фильтрацией и сортировкой.
+    ViewSet для модели Payment с фильтрацией, сортировкой и Stripe интеграцией.
     """
 
-    queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["paid_course", "paid_lesson", "payment_method"]
     ordering_fields = ["payment_date"]
     ordering = ["-payment_date"]
+
+    def get_queryset(self):
+        """
+        Модераторы видят все платежи.
+        Обычные пользователи видят только свои.
+        """
+        user = self.request.user
+        if user.groups.filter(name="moderators").exists():
+            return Payment.objects.all()
+        return Payment.objects.filter(user=user)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Создать платёж с интеграцией Stripe.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Создаём платёж
+        payment = serializer.save(user=request.user)
+
+        # Определяем название продукта
+        if payment.paid_course:
+            product_name = payment.paid_course.title
+        elif payment.paid_lesson:
+            product_name = payment.paid_lesson.title
+        else:
+            product_name = "Продукт"
+
+        try:
+            # Создаём продукт в Stripe
+            stripe_product = create_stripe_product(product_name)
+
+            # Создаём цену в Stripe
+            stripe_price = create_stripe_price(stripe_product.id, payment.amount)
+
+            # Создаём сессию оплаты
+            stripe_session = create_stripe_session(stripe_price.id)
+
+            # Сохраняем данные Stripe в платеже
+            payment.stripe_session_id = stripe_session.id
+            payment.payment_link = stripe_session.url
+            payment.save()
+
+            # Возвращаем данные с ссылкой на оплату
+            return Response(
+                {
+                    "id": payment.id,
+                    "amount": payment.amount,
+                    "payment_link": payment.payment_link,
+                    "session_id": payment.stripe_session_id,
+                    "status": payment.payment_status,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        except Exception as e:
+            # Если ошибка - удаляем созданный платёж
+            payment.delete()
+            return Response(
+                {"error": f"Ошибка создания платежа: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

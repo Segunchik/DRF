@@ -28,5 +28,4 @@ class SubscriptionAdmin(admin.ModelAdmin):
         "user",
         "course",
         "created_at",
-
     )
